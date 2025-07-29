@@ -1,0 +1,36 @@
+{
+  "income": [
+    {
+      "id": 1,
+      "amount": 5000,
+      "source": "Corn Sales",
+      "date": "2024-01-15"
+    }
+  ],
+  "expenses": [
+    {
+      "id": 1,
+      "amount": 1200,
+      "category": "Seeds",
+      "date": "2024-01-10"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "name": "Corn Field A",
+      "status": "Active",
+      "budget": 10000
+    }
+  ],
+  "revenueByCrop": [
+    {
+      "crop": "Corn",
+      "revenue": 5000
+    },
+    {
+      "crop": "Wheat",
+      "revenue": 3000
+    }
+  ]
+}
