@@ -2,9 +2,9 @@ import React from 'react';
 
 const SummaryCards = () => {
   const cards = [
-    { title: 'Total Revenue', value: '$0.00', color: 'text-green-600' },
-    { title: 'Total Expenses', value: '$0.00', color: 'text-red-600' },
-    { title: 'Net Profit', value: '$0.00', color: 'text-blue-600' }
+    { title: 'Total Revenue', value: 'KShs 0.00', color: 'text-green-600' },
+    { title: 'Total Expenses', value: 'KShs 0.00', color: 'text-red-600' },
+    { title: 'Net Profit', value: 'KShs 0.00', color: 'text-blue-600' }
   ];
 
   return (

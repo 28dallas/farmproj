@@ -24,7 +24,7 @@ const Projects = () => {
                 </span>
               </p>
               <p className="text-sm text-gray-600">
-                Budget: <span className="font-medium">${project.budget?.toLocaleString()}</span>
+                Budget: <span className="font-medium">KShs {project.budget?.toLocaleString()}</span>
               </p>
             </div>
           </div>
