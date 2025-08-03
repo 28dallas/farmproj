@@ -9,7 +9,7 @@ import Projects from './components/Projects';
 import { useSidebar } from './context/SidebarContext';
 
 const Dashboard = () => {
-  const { isOpen, toggleSidebar, currentView } = useSidebar();
+  const { isOpen, toggleSidebar, currentView, toggleCollapse } = useSidebar();
   
   return (
     <div className="flex h-screen bg-gray-100">
@@ -25,7 +25,7 @@ const Dashboard = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar />
         
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6" onClick={toggleCollapse}>
           {currentView === 'Dashboard' && (
             <>
               <div className="flex justify-between items-start mb-6">
