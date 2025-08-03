@@ -70,7 +70,7 @@ const Charts = () => {
       </div>
       
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Revenue by Crop</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Project Revenue</h3>
         <div className="h-64 flex items-center justify-center text-gray-500">
           No data available
         </div>
