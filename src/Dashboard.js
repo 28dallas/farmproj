@@ -6,10 +6,18 @@ import Actions from './components/Actions';
 import SummaryCards from './components/SummaryCards';
 import Charts from './components/Charts';
 import Projects from './components/Projects';
+import ExpensesReport from './components/ExpensesReport';
+import CashFlow from './components/CashFlow';
 import { useSidebar } from './context/SidebarContext';
 
 const Dashboard = () => {
-  const { isOpen, toggleSidebar, currentView, toggleCollapse } = useSidebar();
+  const { isOpen, toggleSidebar, currentView, isCollapsed, setIsCollapsed } = useSidebar();
+  
+  const handleMainClick = () => {
+    if (!isCollapsed) {
+      setIsCollapsed(true);
+    }
+  };
   
   return (
     <div className="flex h-screen bg-gray-100">
@@ -25,7 +33,7 @@ const Dashboard = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar />
         
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6" onClick={toggleCollapse}>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6" onClick={handleMainClick}>
           {currentView === 'Dashboard' && (
             <>
               <div className="flex justify-between items-start mb-6">
@@ -40,7 +48,9 @@ const Dashboard = () => {
             </>
           )}
           {currentView === 'Projects' && <Projects />}
-          {currentView !== 'Dashboard' && currentView !== 'Projects' && (
+          {currentView === 'Expenses' && <ExpensesReport />}
+          {currentView === 'Finance' && <CashFlow />}
+          {!['Dashboard', 'Projects', 'Expenses', 'Finance'].includes(currentView) && (
             <div className="text-center py-12">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{currentView}</h2>
               <p className="text-gray-600">This section is coming soon...</p>

@@ -75,6 +75,12 @@ app.get('/api/revenue-by-crop', (req, res) => {
   res.json(data.revenueByCrop);
 });
 
+// Monthly financials endpoint
+app.get('/api/monthly-financials', (req, res) => {
+  const data = readDB();
+  res.json(data.monthlyFinancials);
+});
+
 // Summary endpoint
 app.get('/api/summary', (req, res) => {
   const data = readDB();

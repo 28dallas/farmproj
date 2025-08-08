@@ -9,10 +9,14 @@ export const SidebarProvider = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [currentView, setCurrentView] = useState('Dashboard');
   const toggleSidebar = () => setIsOpen(!isOpen);
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+  
+  const handleViewChange = (view) => {
+    setCurrentView(view);
+    setIsCollapsed(false);
+  };
 
   return (
-    <SidebarContext.Provider value={{ isOpen, toggleSidebar, currentView, setCurrentView, isCollapsed, toggleCollapse }}>
+    <SidebarContext.Provider value={{ isOpen, toggleSidebar, currentView, setCurrentView: handleViewChange, isCollapsed, setIsCollapsed }}>
       {children}
     </SidebarContext.Provider>
   );
