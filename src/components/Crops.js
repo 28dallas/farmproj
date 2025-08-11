@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import AddCropModal from './AddCropModal';
 
 const Crops = () => {
   const [crops, setCrops] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/crops')
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  fetch(`${API_URL}/api/crops`)
       .then(res => res.json())
       .then(data => setCrops(data));
   }, []);
@@ -12,7 +14,7 @@ const Crops = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex gap-2 mb-4">
-        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Add Crop</button>
+        <AddCropModal />
         <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Add Crop Type</button>
       </div>
       <div className="overflow-x-auto">

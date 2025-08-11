@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AddIncomeModal from './AddIncomeModal';
 
 const Income = () => {
   const [income, setIncome] = useState([]);
@@ -13,7 +14,7 @@ const Income = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex gap-2 mb-4">
-        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Record Income</button>
+        <AddIncomeModal />
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">

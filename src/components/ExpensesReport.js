@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AddExpenseModal from './AddExpenseModal';
 
 
 const defaultCategories = ['Utilities', 'Supplies', 'Labor', 'Transport'];
@@ -45,81 +46,13 @@ const ExpensesReport = () => {
       </div>
 
 
-      {/* Add Expense Form (simplified for dropdown demo) */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <h3 className="text-lg font-semibold mb-2">Add Expense</h3>
-        <form className="flex flex-wrap gap-4 items-end">
-          {/* Category Dropdown */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Category</label>
-            <div className="flex gap-2">
-              <select
-                value={selectedCategory}
-                onChange={e => setSelectedCategory(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1"
-              >
-                <option value="">Select Category</option>
-                {categories.map((cat, idx) => (
-                  <option key={idx} value={cat}>{cat}</option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Add Category"
-                value={newCategory}
-                onChange={e => setNewCategory(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1"
-              />
-              <button
-                type="button"
-                className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                onClick={() => {
-                  if (newCategory && !categories.includes(newCategory)) {
-                    setCategories([...categories, newCategory]);
-                    setSelectedCategory(newCategory);
-                    setNewCategory('');
-                  }
-                }}
-              >Add</button>
-            </div>
-          </div>
-          {/* UoM Dropdown */}
-          <div>
-            <label className="block text-sm font-medium mb-1">UoM</label>
-            <div className="flex gap-2">
-              <select
-                value={selectedUom}
-                onChange={e => setSelectedUom(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1"
-              >
-                <option value="">Select UoM</option>
-                {uoms.map((u, idx) => (
-                  <option key={idx} value={u}>{u}</option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Add UoM"
-                value={newUom}
-                onChange={e => setNewUom(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1"
-              />
-              <button
-                type="button"
-                className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                onClick={() => {
-                  if (newUom && !uoms.includes(newUom)) {
-                    setUoms([...uoms, newUom]);
-                    setSelectedUom(newUom);
-                    setNewUom('');
-                  }
-                }}
-              >Add</button>
-            </div>
-          </div>
-          {/* Other form fields can go here */}
-        </form>
-      </div>
+      {/* Add Expense Button and Modal */}
+      <AddExpenseModal
+        categories={categories}
+        setCategories={setCategories}
+        uoms={uoms}
+        setUoms={setUoms}
+      />
 
       {/* Search and Filter */}
       <div className="flex flex-wrap gap-4 items-center">

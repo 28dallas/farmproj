@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import CashFlow from './CashFlow';
 import FinancialSummaryReport from './FinancialSummaryReport';
+import BalanceSheetReport from './BalanceSheetReport';
+import IncomeStatementReport from './IncomeStatementReport';
+import CashFlowReport from './CashFlowReport';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -74,49 +76,13 @@ const Reports = () => {
         <FinancialSummaryReport />
       )}
       {activeReport === 'balance' && (
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Balance Sheet</h3>
-          {/* Example: show profit margin and revenue/expenses */}
-          <div className="bg-white rounded-lg shadow p-6 mb-4">
-            <p className="text-3xl font-bold text-blue-600">Profit Margin: {profitMargin !== null ? profitMargin.toFixed(2) + '%' : 'N/A'}</p>
-          </div>
-          <button className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onClick={() => downloadCSV(transactions, 'balance_sheet.csv')}>Download CSV</button>
-        </div>
+        <BalanceSheetReport profitMargin={profitMargin} transactions={transactions} />
       )}
       {activeReport === 'income' && (
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Income Statement</h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr>
-                  <th className="px-2 py-1 text-left">Date</th>
-                  <th className="px-2 py-1 text-left">Type</th>
-                  <th className="px-2 py-1 text-left">Amount</th>
-                  <th className="px-2 py-1 text-left">Source/Category</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.filter(t => t.type === 'Income').map((t, idx) => (
-                  <tr key={idx}>
-                    <td className="px-2 py-1">{t.date}</td>
-                    <td className="px-2 py-1">{t.type}</td>
-                    <td className="px-2 py-1">KShs {t.amount?.toLocaleString()}</td>
-                    <td className="px-2 py-1">{t.source}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <button className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onClick={() => downloadCSV(transactions.filter(t => t.type === 'Income'), 'income_statement.csv')}>Download CSV</button>
-        </div>
+        <IncomeStatementReport transactions={transactions} />
       )}
       {activeReport === 'cashflow' && (
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Cash Flow</h3>
-          <CashFlow />
-          <button className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onClick={() => downloadCSV(transactions, 'cash_flow.csv')}>Download CSV</button>
-        </div>
+        <CashFlowReport transactions={transactions} />
       )}
     </div>
   );
