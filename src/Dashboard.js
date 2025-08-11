@@ -8,6 +8,8 @@ import Charts from './components/Charts';
 import Projects from './components/Projects';
 import ExpensesReport from './components/ExpensesReport';
 import CashFlow from './components/CashFlow';
+import Reports from './components/Reports';
+import Settings from './components/Settings';
 import { useSidebar } from './context/SidebarContext';
 
 const Dashboard = () => {
@@ -50,7 +52,9 @@ const Dashboard = () => {
           {currentView === 'Projects' && <Projects />}
           {currentView === 'Expenses' && <ExpensesReport />}
           {currentView === 'Finance' && <CashFlow />}
-          {!['Dashboard', 'Projects', 'Expenses', 'Finance'].includes(currentView) && (
+          {currentView === 'Reports' && <Reports />}
+          {currentView === 'Settings' && <Settings />}
+          {!['Dashboard', 'Projects', 'Expenses', 'Finance', 'Reports', 'Settings'].includes(currentView) && (
             <div className="text-center py-12">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{currentView}</h2>
               <p className="text-gray-600">This section is coming soon...</p>

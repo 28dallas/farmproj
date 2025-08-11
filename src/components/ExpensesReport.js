@@ -39,9 +39,6 @@ const ExpensesReport = () => {
           Record Expense
         </button>
         <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-          Export to CSV
-        </button>
-        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
           Batch Expense Upload
         </button>
       </div>
