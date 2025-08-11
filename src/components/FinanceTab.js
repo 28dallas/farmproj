@@ -58,12 +58,7 @@ const FinanceTab = () => {
           className="border border-gray-300 rounded px-3 py-2"
         />
         <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">Apply</button>
-        <div className="flex flex-wrap gap-2 ml-4">
-          <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">Financial Summary</button>
-          <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">Balance Sheet</button>
-          <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">Income Statement</button>
-          <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">Cash Flow</button>
-        </div>
+  {/* Report buttons moved to Reports tab */}
       </div>
       {/* Summary Cards */}
       <SummaryCards />
