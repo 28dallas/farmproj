@@ -12,10 +12,11 @@ const FinanceTab = () => {
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/revenue-by-crop')
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  fetch(`${API_URL}/api/revenue-by-crop`)
       .then(res => res.json())
       .then(data => setRevenueByCrop(data));
-    fetch('http://localhost:5000/api/summary')
+  fetch(`${API_URL}/api/summary`)
       .then(res => res.json())
       .then(data => {
         if (data.totalRevenue !== undefined && data.totalExpenses !== undefined) {
@@ -23,10 +24,10 @@ const FinanceTab = () => {
           setProfitMargin(margin);
         }
       });
-    fetch('http://localhost:5000/api/income')
+  fetch(`${API_URL}/api/income`)
       .then(res => res.json())
       .then(income => {
-        fetch('http://localhost:5000/api/expenses')
+  fetch(`${API_URL}/api/expenses`)
           .then(res => res.json())
           .then(expenses => {
             setTransactions([
@@ -35,7 +36,7 @@ const FinanceTab = () => {
             ].sort((a, b) => new Date(b.date) - new Date(a.date)));
           });
       });
-    fetch('http://localhost:5000/api/projects')
+  fetch(`${API_URL}/api/projects`)
       .then(res => res.json())
       .then(data => setProjects(data));
   }, []);

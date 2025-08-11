@@ -4,7 +4,8 @@ const Income = () => {
   const [income, setIncome] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/income')
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  fetch(`${API_URL}/api/income`)
       .then(res => res.json())
       .then(data => setIncome(data));
   }, []);

@@ -7,7 +7,8 @@ const Inventory = () => {
   const totalValue = items.reduce((sum, item) => sum + (item.totalValue || 0), 0);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/inventory')
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  fetch(`${API_URL}/api/inventory`)
       .then(res => res.json())
       .then(data => setItems(data));
   }, []);

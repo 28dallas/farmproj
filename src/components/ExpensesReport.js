@@ -7,7 +7,8 @@ const ExpensesReport = () => {
   const [filterValue, setFilterValue] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/expenses')
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  fetch(`${API_URL}/api/expenses`)
       .then(res => res.json())
       .then(data => setExpenses(data))
       .catch(err => console.error('Error fetching expenses:', err));

@@ -5,7 +5,8 @@ const CashFlow = () => {
   const [monthlyData, setMonthlyData] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/monthly-financials')
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  fetch(`${API_URL}/api/monthly-financials`)
       .then(res => res.json())
       .then(data => setMonthlyData(data))
       .catch(err => console.error('Error fetching monthly data:', err));
