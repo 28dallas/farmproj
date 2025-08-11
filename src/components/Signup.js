@@ -1,4 +1,7 @@
+
 import React, { useState } from 'react';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const Signup = ({ onSignup, onSwitchToLogin }) => {
   const [username, setUsername] = useState('');
@@ -15,7 +18,7 @@ const Signup = ({ onSignup, onSwitchToLogin }) => {
     setError('');
     setSuccess('');
     try {
-      const res = await fetch('http://localhost:5000/api/signup', {
+      const res = await fetch(`${API_URL}/api/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password, email, displayName })
