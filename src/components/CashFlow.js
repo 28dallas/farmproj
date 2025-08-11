@@ -62,34 +62,31 @@ const CashFlow = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Cash Flow Report</h2>
-      
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="grid grid-cols-5 gap-4 mb-6 text-center">
-          <div className="bg-gray-100 p-4 rounded">
-            <div className="text-2xl font-bold">KShs 1,000,000</div>
-            <div className="text-sm text-gray-600">Starting Balance</div>
+    <div className="space-y-4">
+      <div className="bg-white rounded-lg shadow p-4">
+        <div className="grid grid-cols-5 gap-2 mb-4 text-center">
+          <div className="bg-gray-50 p-2 rounded">
+            <div className="text-base font-semibold truncate">KShs 1M</div>
+            <div className="text-xs text-gray-500">Start</div>
           </div>
-          <div className="bg-gray-100 p-4 rounded">
-            <div className="text-2xl font-bold">KShs 0</div>
-            <div className="text-sm text-gray-600">Total Income</div>
+          <div className="bg-gray-50 p-2 rounded">
+            <div className="text-base font-semibold truncate">KShs 0</div>
+            <div className="text-xs text-gray-500">Income</div>
           </div>
-          <div className="bg-gray-100 p-4 rounded">
-            <div className="text-2xl font-bold">KShs 0</div>
-            <div className="text-sm text-gray-600">Total Expenses</div>
+          <div className="bg-gray-50 p-2 rounded">
+            <div className="text-base font-semibold truncate">KShs 0</div>
+            <div className="text-xs text-gray-500">Expense</div>
           </div>
-          <div className="bg-gray-100 p-4 rounded">
-            <div className="text-2xl font-bold">OK</div>
-            <div className="text-sm text-gray-600">Status</div>
+          <div className="bg-gray-50 p-2 rounded">
+            <div className="text-base font-semibold text-green-600">OK</div>
+            <div className="text-xs text-gray-500">Status</div>
           </div>
-          <div className="bg-gray-100 p-4 rounded">
-            <div className="text-2xl font-bold">KShs 1,000,000</div>
-            <div className="text-sm text-gray-600">Current Balance</div>
+          <div className="bg-gray-50 p-2 rounded">
+            <div className="text-base font-semibold truncate">KShs 1M</div>
+            <div className="text-xs text-gray-500">Current</div>
           </div>
         </div>
-        
-        <div className="h-96">
+        <div className="h-64">
           <Line data={chartData} options={options} />
         </div>
       </div>

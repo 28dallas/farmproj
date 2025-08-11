@@ -34,17 +34,87 @@
     }
   ],
   "monthlyFinancials": [
-    {"month": "January", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "February", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "March", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "April", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "May", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "June", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "July", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "August", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "September", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "October", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "November", "income": 0, "expenses": 0, "cashOnHand": 1000000},
-    {"month": "December", "income": 0, "expenses": 0, "cashOnHand": 1000000}
+    {
+      "month": "January",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "February",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "March",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "April",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "May",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "June",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "July",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "August",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "September",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "October",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "November",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    },
+    {
+      "month": "December",
+      "income": 0,
+      "expenses": 0,
+      "cashOnHand": 1000000
+    }
+  ],
+  "users": [
+    {
+      "id": 1754914793139,
+      "username": "Nathan Krop",
+      "password": "$2b$08$Fs3KvVlj5eVh/PzBROGeiestN5ilTEaTFLC3yK.q5G0l72VGfhnmq",
+      "role": "user",
+      "email": "neithank47@gmail.com",
+      "displayName": "NATE"
+    }
   ]
 }

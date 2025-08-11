@@ -6,35 +6,39 @@ import Actions from './components/Actions';
 import SummaryCards from './components/SummaryCards';
 import Charts from './components/Charts';
 import Projects from './components/Projects';
+import Crops from './components/Crops';
+import Income from './components/Income';
+import Inventory from './components/Inventory';
 import ExpensesReport from './components/ExpensesReport';
 import CashFlow from './components/CashFlow';
 import Reports from './components/Reports';
 import Settings from './components/Settings';
+import FinanceTab from './components/FinanceTab';
 import { useSidebar } from './context/SidebarContext';
 
-const Dashboard = () => {
+const Dashboard = ({ user, onLogout }) => {
   const { isOpen, toggleSidebar, currentView, isCollapsed, setIsCollapsed } = useSidebar();
-  
+
   const handleMainClick = () => {
     if (!isCollapsed) {
       setIsCollapsed(true);
     }
   };
-  
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
-      
+
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" 
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={toggleSidebar}
         />
       )}
-      
+
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
-        
+        <Navbar user={user} onLogout={onLogout} />
+
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-6" onClick={handleMainClick}>
           {currentView === 'Dashboard' && (
             <>
@@ -50,8 +54,12 @@ const Dashboard = () => {
             </>
           )}
           {currentView === 'Projects' && <Projects />}
+          {currentView === 'Crops' && <Crops />}
+          {currentView === 'Income' && <Income />}
+          {currentView === 'Inventory' && <Inventory />}
           {currentView === 'Expenses' && <ExpensesReport />}
-          {currentView === 'Finance' && <CashFlow />}
+          {/* Removed incorrect require() usage. Only <FinanceTab /> remains. */}
+          {currentView === 'Finance' && <FinanceTab />}
           {currentView === 'Reports' && <Reports />}
           {currentView === 'Settings' && <Settings />}
           {!['Dashboard', 'Projects', 'Expenses', 'Finance', 'Reports', 'Settings'].includes(currentView) && (

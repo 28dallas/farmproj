@@ -1,3 +1,24 @@
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const speakeasy = require('speakeasy');
+const qrcode = require('qrcode');
+const multer = require('multer');
+// In-memory login activity log (for demo)
+let loginActivity = [];
+
+const app = express();
+const PORT = 5000;
+const upload = multer({ dest: 'uploads/' });
+const dbPath = path.join(__dirname, 'db.json');
+
+app.use(cors());
+app.use(bodyParser.json());
+
+
 // Signup endpoint
 app.post('/api/signup', (req, res) => {
   const { username, password, email, displayName } = req.body;
@@ -11,7 +32,7 @@ app.post('/api/signup', (req, res) => {
   const newUser = {
     id: Date.now(),
     username,
-    password: require('bcryptjs').hashSync(password, 8),
+    password: bcrypt.hashSync(password, 8),
     role: 'user',
     email: email || '',
     displayName: displayName || username
@@ -20,10 +41,6 @@ app.post('/api/signup', (req, res) => {
   writeDB(data);
   res.json({ id: newUser.id, username: newUser.username, role: newUser.role });
 });
-const speakeasy = require('speakeasy');
-const qrcode = require('qrcode');
-// In-memory login activity log (for demo)
-let loginActivity = [];
 
 // 2FA setup endpoint
 app.post('/api/2fa/setup', (req, res) => {
@@ -60,9 +77,6 @@ function logLogin(username, status) {
   if (loginActivity.length > 100) loginActivity.shift();
 }
 
-// Add login activity logging to login endpoint
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 // Export db.json
 app.get('/api/export', (req, res) => {
   res.download(dbPath, 'db.json');
@@ -88,19 +102,19 @@ app.post('/api/reset', (req, res) => {
       {
         id: 1,
         username: 'admin',
-        password: require('bcryptjs').hashSync('adminpass', 8),
+        password: bcrypt.hashSync('adminpass', 8),
         role: 'admin'
       },
       {
         id: 2,
         username: 'user1',
-        password: require('bcryptjs').hashSync('user1pass', 8),
+        password: bcrypt.hashSync('user1pass', 8),
         role: 'user'
       },
       {
         id: 3,
         username: 'user2',
-        password: require('bcryptjs').hashSync('user2pass', 8),
+        password: bcrypt.hashSync('user2pass', 8),
         role: 'user'
       }
     ]
@@ -108,22 +122,6 @@ app.post('/api/reset', (req, res) => {
   fs.writeFileSync(dbPath, JSON.stringify(initialData, null, 2));
   res.json({ message: 'Data reset successfully' });
 });
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const path = require('path');
-const bcrypt = require('bcryptjs');
-
-const app = express();
-const PORT = 5000;
-
-
-const dbPath = path.join(__dirname, 'db.json');
-
-
-app.use(cors());
-app.use(bodyParser.json());
 
 
 

@@ -6,9 +6,15 @@ import Signup from './components/Signup';
 import { SettingsProvider } from './context/SettingsContext';
 
 
+
 function App() {
   const [user, setUser] = useState(null);
   const [showSignup, setShowSignup] = useState(false);
+
+  const handleLogout = () => {
+    setUser(null);
+    setShowSignup(false);
+  };
 
   if (!user) {
     if (showSignup) {
@@ -20,7 +26,7 @@ function App() {
   return (
     <SettingsProvider>
       <SidebarProvider>
-        <Dashboard user={user} />
+        <Dashboard user={user} onLogout={handleLogout} />
       </SidebarProvider>
     </SettingsProvider>
   );

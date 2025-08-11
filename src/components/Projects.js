@@ -1,34 +1,64 @@
+
 import React, { useState, useEffect } from 'react';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3001/projects')
+    fetch('http://localhost:5000/api/projects')
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error('Error fetching projects:', err));
   }, []);
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">All Projects</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map(project => (
-          <div key={project.id} className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">{project.name}</h3>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">
-                Status: <span className={`font-medium ${project.status === 'Active' ? 'text-green-600' : 'text-gray-600'}`}>
-                  {project.status}
-                </span>
-              </p>
-              <p className="text-sm text-gray-600">
-                Budget: <span className="font-medium">KShs {project.budget?.toLocaleString()}</span>
-              </p>
-            </div>
-          </div>
-        ))}
+    <div className="bg-white rounded-lg shadow p-6">
+      <div className="flex gap-2 mb-4">
+        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Add Project</button>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-teal-700 text-white">
+              <th className="px-2 py-1 text-left">Name</th>
+              <th className="px-2 py-1 text-left">Crop</th>
+              <th className="px-2 py-1 text-left">Acreage</th>
+              <th className="px-2 py-1 text-left">Yield/Acre</th>
+              <th className="px-2 py-1 text-left">Market Price</th>
+              <th className="px-2 py-1 text-left">Cost/Acre</th>
+              <th className="px-2 py-1 text-left">Est. Income</th>
+              <th className="px-2 py-1 text-left">Est. Cost</th>
+              <th className="px-2 py-1 text-left">Status</th>
+              <th className="px-2 py-1 text-left">Start Date</th>
+              <th className="px-2 py-1 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {projects.length === 0 && (
+              <tr>
+                <td colSpan="11" className="text-center text-gray-500 py-4">No projects found</td>
+              </tr>
+            )}
+            {projects.map((project, idx) => (
+              <tr key={idx} className="border-b">
+                <td className="px-2 py-1">{project.name}</td>
+                <td className="px-2 py-1">{project.crop}</td>
+                <td className="px-2 py-1">{project.acreage}</td>
+                <td className="px-2 py-1">{project.yieldAcre}</td>
+                <td className="px-2 py-1">{project.marketPrice}</td>
+                <td className="px-2 py-1">{project.costAcre}</td>
+                <td className="px-2 py-1">{project.estIncome}</td>
+                <td className="px-2 py-1">{project.estCost}</td>
+                <td className="px-2 py-1">{project.status}</td>
+                <td className="px-2 py-1">{project.startDate}</td>
+                <td className="px-2 py-1">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded mr-2">Edit</button>
+                  <button className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
