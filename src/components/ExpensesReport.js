@@ -23,11 +23,38 @@ const ExpensesReport = () => {
   };
 
   useEffect(() => {
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-  fetch(`${API_URL}/api/expenses`)
-      .then(res => res.json())
-      .then(data => setExpenses(data))
-      .catch(err => console.error('Error fetching expenses:', err));
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      console.warn('No authentication token found');
+      return;
+    }
+    
+    fetch(`${API_URL}/api/expenses`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setExpenses(data);
+        } else {
+          console.error('Expenses data is not an array:', data);
+          setExpenses([]);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching expenses:', err);
+        setExpenses([]);
+      });
   }, []);
 
   const allExpenses = [...expenses, ...localExpenses];

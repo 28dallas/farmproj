@@ -12,7 +12,7 @@ const Crops = () => {
   const allCrops = [...crops, ...localCrops];
 
   useEffect(() => {
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const API_URL = process.env.REACT_APP_API_URL;
   fetch(`${API_URL}/api/crops`)
       .then(res => res.json())
       .then(data => setCrops(data));

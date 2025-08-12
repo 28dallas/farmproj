@@ -14,32 +14,64 @@ const Reports = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/revenue-by-crop`)
-      .then(res => res.json())
-      .then(data => setRevenueByCrop(data));
-    fetch(`${API_URL}/api/summary`)
-      .then(res => res.json())
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      console.warn('No authentication token found');
+      return;
+    }
+    
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+    
+    // Fetch revenue by crop
+    fetch(`${API_URL}/api/revenue-by-crop`, { headers })
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setRevenueByCrop(Array.isArray(data) ? data : []))
+      .catch(err => {
+        console.error('Error fetching revenue by crop:', err);
+        setRevenueByCrop([]);
+      });
+    
+    // Fetch summary
+    fetch(`${API_URL}/api/summary`, { headers })
+      .then(res => res.ok ? res.json() : {})
       .then(data => {
         if (data.totalRevenue !== undefined && data.totalExpenses !== undefined) {
           const margin = data.totalRevenue === 0 ? 0 : ((data.totalRevenue - data.totalExpenses) / data.totalRevenue) * 100;
           setProfitMargin(margin);
         }
+      })
+      .catch(err => console.error('Error fetching summary:', err));
+    
+    // Fetch income and expenses
+    Promise.all([
+      fetch(`${API_URL}/api/income`, { headers }).then(res => res.ok ? res.json() : []),
+      fetch(`${API_URL}/api/expenses`, { headers }).then(res => res.ok ? res.json() : [])
+    ])
+      .then(([income, expenses]) => {
+        const incomeArray = Array.isArray(income) ? income : [];
+        const expensesArray = Array.isArray(expenses) ? expenses : [];
+        setTransactions([
+          ...incomeArray.map(i => ({ ...i, type: 'Income' })),
+          ...expensesArray.map(e => ({ ...e, type: 'Expense' }))
+        ].sort((a, b) => new Date(b.date) - new Date(a.date)));
+      })
+      .catch(err => {
+        console.error('Error fetching transactions:', err);
+        setTransactions([]);
       });
-    fetch(`${API_URL}/api/income`)
-      .then(res => res.json())
-      .then(income => {
-        fetch(`${API_URL}/api/expenses`)
-          .then(res => res.json())
-          .then(expenses => {
-            setTransactions([
-              ...income.map(i => ({ ...i, type: 'Income' })),
-              ...expenses.map(e => ({ ...e, type: 'Expense' }))
-            ].sort((a, b) => new Date(b.date) - new Date(a.date)));
-          });
+    
+    // Fetch projects
+    fetch(`${API_URL}/api/projects`, { headers })
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setProjects(Array.isArray(data) ? data : []))
+      .catch(err => {
+        console.error('Error fetching projects:', err);
+        setProjects([]);
       });
-    fetch(`${API_URL}/api/projects`)
-      .then(res => res.json())
-      .then(data => setProjects(data));
   }, []);
 
   // Download helpers (CSV export for demo)

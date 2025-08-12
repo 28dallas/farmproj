@@ -20,7 +20,8 @@ const Settings = () => {
   };
 
   const handleExport = async () => {
-    window.open('http://localhost:5000/api/export', '_blank');
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    window.open(`${API_URL}/api/export`, '_blank');
   };
 
   const handleImport = async (e) => {
@@ -28,7 +29,8 @@ const Settings = () => {
     if (!file) return;
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch('http://localhost:5000/api/import', {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const res = await fetch(`${API_URL}/api/import`, {
       method: 'POST',
       body: formData
     });
@@ -41,7 +43,8 @@ const Settings = () => {
 
   const handleResetData = async () => {
     if (window.confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-      const res = await fetch('http://localhost:5000/api/reset', { method: 'POST' });
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/reset`, { method: 'POST' });
       if (res.ok) {
         alert('Data reset successfully! Please reload the app.');
       } else {
@@ -62,7 +65,8 @@ const Settings = () => {
   const handleEnable2FA = async () => {
     setShow2FA(true);
     // For demo, use displayName as username
-    const res = await fetch('http://localhost:5000/api/2fa/setup', {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const res = await fetch(`${API_URL}/api/2fa/setup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: displayName })
@@ -73,7 +77,8 @@ const Settings = () => {
   };
 
   const handleVerify2FA = async () => {
-    const res = await fetch('http://localhost:5000/api/2fa/verify', {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const res = await fetch(`${API_URL}/api/2fa/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: displayName, token })
@@ -85,7 +90,8 @@ const Settings = () => {
   const handleViewLoginActivity = async () => {
     setShowActivity(!showActivity);
     if (!showActivity) {
-      const res = await fetch('http://localhost:5000/api/login-activity');
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/login-activity`);
       const data = await res.json();
       setLoginActivity(data);
     }

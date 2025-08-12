@@ -5,11 +5,38 @@ const CashFlow = () => {
   const [monthlyData, setMonthlyData] = useState([]);
 
   useEffect(() => {
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-  fetch(`${API_URL}/api/monthly-financials`)
-      .then(res => res.json())
-      .then(data => setMonthlyData(data))
-      .catch(err => console.error('Error fetching monthly data:', err));
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      console.warn('No authentication token found');
+      return;
+    }
+    
+    fetch(`${API_URL}/api/monthly-financials`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setMonthlyData(data);
+        } else {
+          console.error('Monthly data is not an array:', data);
+          setMonthlyData([]);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching monthly data:', err);
+        setMonthlyData([]);
+      });
   }, []);
 
   const chartData = {
