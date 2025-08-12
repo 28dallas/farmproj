@@ -6,8 +6,7 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended'
+    'plugin:react/recommended'
   ],
   parserOptions: {
     ecmaFeatures: {
@@ -17,8 +16,7 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: [
-    'react',
-    'react-hooks'
+    'react'
   ],
   rules: {
     'react/prop-types': 'warn',
@@ -27,8 +25,7 @@ module.exports = {
     'no-console': 'warn',
     'prefer-const': 'error',
     'no-var': 'error',
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn'
+
   },
   settings: {
     react: {

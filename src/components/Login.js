@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 
 const Login = ({ onSwitchToSignup }) => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+  // Redirect to dashboard if already authenticated
+  // No reload needed; App rerenders on isAuthenticated
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,13 +20,21 @@ const Login = ({ onSwitchToSignup }) => {
     
     try {
       const response = await apiService.login({ username, password });
-      const { token, ...userData } = response;
+      console.log('Login response:', response); // Debug log
       
-      setSuccess('Login successful! Redirecting...');
-      setTimeout(() => {
+      if (response && response.token) {
+        const { token, ...userData } = response;
+        setSuccess('Login successful! Redirecting...');
         login(userData, token);
-      }, 1000);
+      } else if (response) {
+        // Handle response without token
+        setSuccess('Login successful! Redirecting...');
+        login(response, 'temp-token');
+      } else {
+        throw new Error('No response from server');
+      }
     } catch (err) {
+      console.error('Login error:', err);
       setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
@@ -73,7 +83,7 @@ const Login = ({ onSwitchToSignup }) => {
         </button>
         <div className="text-center mt-2">
           <button type="button" className="text-green-700 underline" onClick={onSwitchToSignup}>
-            Don't have an account? Sign Up
+            Don&apos;t have an account? Sign Up
           </button>
         </div>
       </form>

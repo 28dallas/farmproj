@@ -23,7 +23,7 @@ class ApiService {
     try {
       const response = await fetch(url, config);
       
-      if (response.status === 401) {
+      if (response.status === 401 && !endpoint.includes('/login') && !endpoint.includes('/signup')) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/';

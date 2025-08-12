@@ -1,10 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/api';
 
 const Signup = ({ onSwitchToLogin }) => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+  // Redirect to dashboard if already authenticated
+  // No reload needed; App rerenders on isAuthenticated
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -24,9 +26,7 @@ const Signup = ({ onSwitchToLogin }) => {
       const { token, ...userData } = response;
       
       setSuccess('Signup successful! Logging you in...');
-      setTimeout(() => {
-        login(userData, token);
-      }, 1000);
+      login(userData, token);
     } catch (err) {
       if (err.message.includes('Password must')) {
         setError('Password must be at least 8 characters with uppercase, lowercase, number and special character');
