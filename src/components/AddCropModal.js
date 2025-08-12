@@ -1,8 +1,37 @@
 import React, { useState } from 'react';
 
-const AddCropModal = () => {
+const AddCropModal = ({ onAddCrop }) => {
   const [show, setShow] = useState(false);
-  // Add more state for crop fields as needed
+  const [formData, setFormData] = useState({
+    name: '',
+    type: '',
+    growingSeason: '',
+    avgYieldAcre: '',
+    marketPriceUnit: '',
+    avgCostAcre: '',
+    avgIncomeAcre: '',
+    avgReturns: ''
+  });
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onAddCrop({ ...formData, id: Date.now() });
+    setFormData({
+      name: '',
+      type: '',
+      growingSeason: '',
+      avgYieldAcre: '',
+      marketPriceUnit: '',
+      avgCostAcre: '',
+      avgIncomeAcre: '',
+      avgReturns: ''
+    });
+    setShow(false);
+  };
 
   return (
     <>
@@ -23,12 +52,70 @@ const AddCropModal = () => {
               &times;
             </button>
             <h3 className="text-lg font-semibold mb-4">Add Crop</h3>
-            <form className="flex flex-col gap-4">
-              {/* Add crop fields here */}
-              <input className="border rounded px-3 py-2" placeholder="Crop Name" />
-              <input className="border rounded px-3 py-2" placeholder="Type" />
-              <input className="border rounded px-3 py-2" placeholder="Growing Season" />
-              {/* ... */}
+            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Crop Name"
+                required
+              />
+              <input
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Type"
+                required
+              />
+              <input
+                name="growingSeason"
+                value={formData.growingSeason}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Growing Season"
+              />
+              <input
+                name="avgYieldAcre"
+                value={formData.avgYieldAcre}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Avg Yield/Acre"
+                type="number"
+              />
+              <input
+                name="marketPriceUnit"
+                value={formData.marketPriceUnit}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Market Price/Unit"
+                type="number"
+              />
+              <input
+                name="avgCostAcre"
+                value={formData.avgCostAcre}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Avg Cost/Acre"
+                type="number"
+              />
+              <input
+                name="avgIncomeAcre"
+                value={formData.avgIncomeAcre}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Avg Income/Acre"
+                type="number"
+              />
+              <input
+                name="avgReturns"
+                value={formData.avgReturns}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Avg Returns"
+                type="number"
+              />
               <div className="flex justify-end mt-6">
                 <button
                   className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded mr-2"
@@ -38,8 +125,7 @@ const AddCropModal = () => {
                 <button
                   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                   type="submit"
-                  onClick={e => { e.preventDefault(); setShow(false); }}
-                >Save</button>
+                >Save Crop</button>
               </div>
             </form>
           </div>

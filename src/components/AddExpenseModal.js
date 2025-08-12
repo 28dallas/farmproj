@@ -1,11 +1,55 @@
 import React, { useState } from 'react';
 
-const AddExpenseModal = ({ categories, setCategories, uoms, setUoms }) => {
+const AddExpenseModal = ({ categories, setCategories, uoms, setUoms, onAddExpense }) => {
   const [show, setShow] = useState(false);
   const [newCategory, setNewCategory] = useState('');
   const [newUom, setNewUom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedUom, setSelectedUom] = useState('');
+  const [formData, setFormData] = useState({
+    date: '',
+    project: '',
+    description: '',
+    units: '',
+    costPerUnit: '',
+    otherCosts: '',
+    supplier: '',
+    paymentMethod: '',
+    referenceNo: '',
+    status: 'Pending'
+  });
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const totalCost = (parseFloat(formData.units || 0) * parseFloat(formData.costPerUnit || 0)) + parseFloat(formData.otherCosts || 0);
+    const newExpense = {
+      ...formData,
+      category: selectedCategory,
+      uom: selectedUom,
+      totalCost,
+      id: Date.now()
+    };
+    onAddExpense(newExpense);
+    setFormData({
+      date: '',
+      project: '',
+      description: '',
+      units: '',
+      costPerUnit: '',
+      otherCosts: '',
+      supplier: '',
+      paymentMethod: '',
+      referenceNo: '',
+      status: 'Pending'
+    });
+    setSelectedCategory('');
+    setSelectedUom('');
+    setShow(false);
+  };
 
   return (
     <>
@@ -26,76 +70,151 @@ const AddExpenseModal = ({ categories, setCategories, uoms, setUoms }) => {
               &times;
             </button>
             <h3 className="text-lg font-semibold mb-4">Add Expense</h3>
-            <form className="flex flex-wrap gap-4 items-end">
-              {/* Category Dropdown */}
+            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Project</label>
+                <input
+                  type="text"
+                  name="project"
+                  value={formData.project}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="Project name"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium mb-1">Description</label>
+                <input
+                  type="text"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="Expense description"
+                  required
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Category</label>
-                <div className="flex gap-2">
-                  <select
-                    value={selectedCategory}
-                    onChange={e => setSelectedCategory(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1"
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map((cat, idx) => (
-                      <option key={idx} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="Add Category"
-                    value={newCategory}
-                    onChange={e => setNewCategory(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1"
-                  />
-                  <button
-                    type="button"
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                    onClick={() => {
-                      if (newCategory && !categories.includes(newCategory)) {
-                        setCategories([...categories, newCategory]);
-                        setSelectedCategory(newCategory);
-                        setNewCategory('');
-                      }
-                    }}
-                  >Add</button>
-                </div>
+                <select
+                  value={selectedCategory}
+                  onChange={e => setSelectedCategory(e.target.value)}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((cat, idx) => (
+                    <option key={idx} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
-              {/* UoM Dropdown */}
               <div>
                 <label className="block text-sm font-medium mb-1">UoM</label>
-                <div className="flex gap-2">
-                  <select
-                    value={selectedUom}
-                    onChange={e => setSelectedUom(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1"
-                  >
-                    <option value="">Select UoM</option>
-                    {uoms.map((u, idx) => (
-                      <option key={idx} value={u}>{u}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="Add UoM"
-                    value={newUom}
-                    onChange={e => setNewUom(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1"
-                  />
-                  <button
-                    type="button"
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-                    onClick={() => {
-                      if (newUom && !uoms.includes(newUom)) {
-                        setUoms([...uoms, newUom]);
-                        setSelectedUom(newUom);
-                        setNewUom('');
-                      }
-                    }}
-                  >Add</button>
-                </div>
+                <select
+                  value={selectedUom}
+                  onChange={e => setSelectedUom(e.target.value)}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="">Select UoM</option>
+                  {uoms.map((u, idx) => (
+                    <option key={idx} value={u}>{u}</option>
+                  ))}
+                </select>
               </div>
-              {/* Other form fields can go here */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Units</label>
+                <input
+                  type="number"
+                  name="units"
+                  value={formData.units}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Cost per Unit</label>
+                <input
+                  type="number"
+                  name="costPerUnit"
+                  value={formData.costPerUnit}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Other Costs</label>
+                <input
+                  type="number"
+                  name="otherCosts"
+                  value={formData.otherCosts}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Supplier/Vendor</label>
+                <input
+                  type="text"
+                  name="supplier"
+                  value={formData.supplier}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="Supplier name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Payment Method</label>
+                <select
+                  name="paymentMethod"
+                  value={formData.paymentMethod}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="">Select Method</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="Mobile Money">Mobile Money</option>
+                  <option value="Cheque">Cheque</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Reference No</label>
+                <input
+                  type="text"
+                  name="referenceNo"
+                  value={formData.referenceNo}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="Reference number"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Status</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Overdue">Overdue</option>
+                </select>
+              </div>
             </form>
             <div className="flex justify-end mt-6">
               <button
@@ -106,8 +225,8 @@ const AddExpenseModal = ({ categories, setCategories, uoms, setUoms }) => {
               <button
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                 type="submit"
-                onClick={e => { e.preventDefault(); setShow(false); }}
-              >Save</button>
+                onClick={handleSubmit}
+              >Save Expense</button>
             </div>
           </div>
         </div>

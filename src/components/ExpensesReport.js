@@ -16,6 +16,11 @@ const ExpensesReport = () => {
   const [newUom, setNewUom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedUom, setSelectedUom] = useState('');
+  const [localExpenses, setLocalExpenses] = useState([]);
+
+  const handleAddExpense = (newExpense) => {
+    setLocalExpenses(prev => [...prev, newExpense]);
+  };
 
   useEffect(() => {
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -25,7 +30,8 @@ const ExpensesReport = () => {
       .catch(err => console.error('Error fetching expenses:', err));
   }, []);
 
-  const totalExpenses = expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
+  const allExpenses = [...expenses, ...localExpenses];
+  const totalExpenses = allExpenses.reduce((sum, expense) => sum + (expense.amount || expense.totalCost || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -52,6 +58,7 @@ const ExpensesReport = () => {
         setCategories={setCategories}
         uoms={uoms}
         setUoms={setUoms}
+        onAddExpense={handleAddExpense}
       />
 
       {/* Search and Filter */}
@@ -107,23 +114,23 @@ const ExpensesReport = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {expenses.length === 0 ? (
               <tr>
-                <td colSpan="11" className="px-4 py-8 text-center text-gray-500">
+                <td colSpan="12" className="px-4 py-8 text-center text-gray-500">
                   No expenses recorded yet
                 </td>
               </tr>
             ) : (
-              expenses.map((expense, index) => (
-                <tr key={expense.id || index}>
-                  <td className="px-4 py-3 text-sm text-gray-900">{expense.date}</td>
+              [...allExpenses, ...Array(Math.max(0, 3 - allExpenses.length)).fill(null)].map((expense, index) => (
+                <tr key={expense?.id || `empty-${index}`}>
+                  <td className="px-4 py-3 text-sm text-gray-900">{expense?.date || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">-</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{expense.category}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{expense.category}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">-</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">-</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{expense?.category || '-'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{expense?.category || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">-</td>
                   <td className="px-4 py-3 text-sm text-gray-900">-</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">KShs {expense.amount?.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-sm text-green-600">Yes</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">-</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">-</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{expense?.amount ? `KShs ${expense.amount.toLocaleString()}` : expense?.totalCost ? `KShs ${expense.totalCost.toLocaleString()}` : '-'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{expense?.status === 'Paid' ? 'Yes' : expense ? 'No' : '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">-</td>
                 </tr>
               ))
@@ -131,7 +138,7 @@ const ExpensesReport = () => {
           </tbody>
         </table>
         <div className="bg-gray-50 px-4 py-3 text-sm text-gray-700">
-          Page 1 of {Math.max(1, Math.ceil(expenses.length / 10))}
+          Page 1 of {Math.max(1, Math.ceil((expenses.length + 10) / 10))}
         </div>
       </div>
 

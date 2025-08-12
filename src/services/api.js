@@ -1,0 +1,101 @@
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+class ApiService {
+  constructor() {
+    this.baseURL = API_URL;
+  }
+
+  getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+  }
+
+  async request(endpoint, options = {}) {
+    const url = `${this.baseURL}${endpoint}`;
+    const config = {
+      headers: this.getAuthHeaders(),
+      ...options
+    };
+
+    try {
+      const response = await fetch(url, config);
+      
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || `HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`API Error (${endpoint}):`, error);
+      throw error;
+    }
+  }
+
+  async login(credentials) {
+    return this.request('/api/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials)
+    });
+  }
+
+  async signup(userData) {
+    return this.request('/api/signup', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  }
+
+  async getIncome() {
+    return this.request('/api/income');
+  }
+
+  async addIncome(data) {
+    return this.request('/api/income', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async getExpenses() {
+    return this.request('/api/expenses');
+  }
+
+  async addExpense(data) {
+    return this.request('/api/expenses', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async getProjects() {
+    return this.request('/api/projects');
+  }
+
+  async addProject(data) {
+    return this.request('/api/projects', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async getSummary() {
+    return this.request('/api/summary');
+  }
+
+  async healthCheck() {
+    return this.request('/api/health');
+  }
+}
+
+export default new ApiService();

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import apiService from '../services/api';
 
-const Login = ({ onLogin, onSwitchToSignup }) => {
+const Login = ({ onSwitchToSignup }) => {
+  const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -12,22 +15,17 @@ const Login = ({ onLogin, onSwitchToSignup }) => {
     setLoading(true);
     setError('');
     setSuccess('');
+    
     try {
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-  const res = await fetch(`${API_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || 'Invalid username or password');
-      }
-      const user = await res.json();
+      const response = await apiService.login({ username, password });
+      const { token, ...userData } = response;
+      
       setSuccess('Login successful! Redirecting...');
-      setTimeout(() => onLogin(user), 1000);
+      setTimeout(() => {
+        login(userData, token);
+      }, 1000);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }

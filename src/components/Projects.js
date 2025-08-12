@@ -4,6 +4,13 @@ import AddProjectModal from './AddProjectModal';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
+  const [localProjects, setLocalProjects] = useState([]);
+
+  const handleAddProject = (newProject) => {
+    setLocalProjects(prev => [...prev, newProject]);
+  };
+
+  const allProjects = [...projects, ...localProjects];
 
   useEffect(() => {
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -16,7 +23,7 @@ const Projects = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex gap-2 mb-4">
-        <AddProjectModal />
+        <AddProjectModal onAddProject={handleAddProject} />
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
@@ -36,12 +43,12 @@ const Projects = () => {
             </tr>
           </thead>
           <tbody>
-            {projects.length === 0 && (
+            {allProjects.length === 0 && (
               <tr>
                 <td colSpan="11" className="text-center text-gray-500 py-4">No projects found</td>
               </tr>
             )}
-            {projects.map((project, idx) => (
+            {allProjects.map((project, idx) => (
               <tr key={idx} className="border-b">
                 <td className="px-2 py-1">{project.name}</td>
                 <td className="px-2 py-1">{project.crop}</td>

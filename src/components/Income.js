@@ -3,6 +3,13 @@ import AddIncomeModal from './AddIncomeModal';
 
 const Income = () => {
   const [income, setIncome] = useState([]);
+  const [localIncome, setLocalIncome] = useState([]);
+
+  const handleAddIncome = (newIncome) => {
+    setLocalIncome(prev => [...prev, newIncome]);
+  };
+
+  const allIncome = [...income, ...localIncome];
 
   useEffect(() => {
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -14,7 +21,7 @@ const Income = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex gap-2 mb-4">
-        <AddIncomeModal />
+        <AddIncomeModal onAddIncome={handleAddIncome} />
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
@@ -32,12 +39,12 @@ const Income = () => {
             </tr>
           </thead>
           <tbody>
-            {income.length === 0 && (
+            {allIncome.length === 0 && (
               <tr>
                 <td colSpan="9" className="text-center text-gray-500 py-4">No income records found</td>
               </tr>
             )}
-            {income.map((item, idx) => (
+            {allIncome.map((item, idx) => (
               <tr key={idx} className="border-b">
                 <td className="px-2 py-1">{item.date}</td>
                 <td className="px-2 py-1">{item.project}</td>

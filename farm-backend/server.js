@@ -4,23 +4,105 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const { body, validationResult } = require('express-validator');
+const winston = require('winston');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 const multer = require('multer');
+
+// Logger setup
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.Console()
+  ]
+});
+
 // In-memory login activity log (for demo)
 let loginActivity = [];
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 const app = express();
 const PORT = 5000;
 const upload = multer({ dest: 'uploads/' });
 const dbPath = path.join(__dirname, 'db.json');
 
+// Security middleware
+app.use(helmet());
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
+
+// Rate limiting
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per window
+  message: { error: 'Too many login attempts, please try again later' }
+});
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100 // 100 requests per window
+});
+
+app.use('/api/login', authLimiter);
+app.use('/api/signup', authLimiter);
+app.use('/api', generalLimiter);
+
+// JWT middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+  
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      logger.warn('Invalid token attempt', { ip: req.ip, token: token.substring(0, 10) });
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// Password validation
+const passwordValidation = [
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must contain uppercase, lowercase, number and special character')
+];
+
+// Input validation middleware
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
 
 
 // Signup endpoint
-app.post('/api/signup', (req, res) => {
+app.post('/api/signup', [
+  body('username').isLength({ min: 3 }).trim().escape(),
+  body('email').optional().isEmail().normalizeEmail(),
+  ...passwordValidation,
+  handleValidationErrors
+], (req, res) => {
   const { username, password, email, displayName } = req.body;
   if (!username || !password) {
     return res.status(400).json({ message: 'Username and password are required' });
@@ -32,14 +114,28 @@ app.post('/api/signup', (req, res) => {
   const newUser = {
     id: Date.now(),
     username,
-    password: bcrypt.hashSync(password, 8),
+    password: bcrypt.hashSync(password, 12),
     role: 'user',
     email: email || '',
-    displayName: displayName || username
+    displayName: displayName || username,
+    createdAt: new Date().toISOString()
   };
   data.users.push(newUser);
   writeDB(data);
-  res.json({ id: newUser.id, username: newUser.username, role: newUser.role });
+  
+  const token = jwt.sign(
+    { id: newUser.id, username: newUser.username, role: newUser.role },
+    JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+  
+  logger.info('User registered', { username, id: newUser.id });
+  res.json({ 
+    id: newUser.id, 
+    username: newUser.username, 
+    role: newUser.role,
+    token 
+  });
 });
 
 // 2FA setup endpoint
@@ -161,7 +257,11 @@ const initDB = () => {
   }
 };
 // Login endpoint
-app.post('/api/login', (req, res) => {
+app.post('/api/login', [
+  body('username').trim().escape(),
+  body('password').notEmpty(),
+  handleValidationErrors
+], (req, res) => {
   const { username, password } = req.body;
   const data = readDB();
   const user = data.users && data.users.find(u => u.username === username);
@@ -174,8 +274,21 @@ app.post('/api/login', (req, res) => {
     return res.status(401).json({ message: 'Invalid username or password' });
   }
   logLogin(username, 'success');
-  // For demo, return user info (never return password)
-  res.json({ id: user.id, username: user.username, role: user.role, twoFA: !!user.twoFASecret });
+  
+  const token = jwt.sign(
+    { id: user.id, username: user.username, role: user.role },
+    JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+  
+  logger.info('User logged in', { username, id: user.id });
+  res.json({ 
+    id: user.id, 
+    username: user.username, 
+    role: user.role, 
+    twoFA: !!user.twoFASecret,
+    token 
+  });
 });
 
 // Get login activity
@@ -188,13 +301,26 @@ const writeDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2)
 
 
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
 // Income endpoints
-app.get('/api/income', (req, res) => {
+app.get('/api/income', authenticateToken, (req, res) => {
   const data = readDB();
   res.json(data.income);
 });
 
-app.post('/api/income', (req, res) => {
+app.post('/api/income', [
+  authenticateToken,
+  body('date').isISO8601().toDate(),
+  body('project').trim().escape(),
+  body('crop').trim().escape(),
+  body('yield').optional().isNumeric(),
+  body('priceUnit').optional().isNumeric(),
+  handleValidationErrors
+], (req, res) => {
   const data = readDB();
   const newIncome = { id: Date.now(), ...req.body };
   data.income.push(newIncome);
@@ -205,12 +331,20 @@ app.post('/api/income', (req, res) => {
 
 
 // Expenses endpoints
-app.get('/api/expenses', (req, res) => {
+app.get('/api/expenses', authenticateToken, (req, res) => {
   const data = readDB();
   res.json(data.expenses);
 });
 
-app.post('/api/expenses', (req, res) => {
+app.post('/api/expenses', [
+  authenticateToken,
+  body('date').isISO8601().toDate(),
+  body('description').trim().escape(),
+  body('category').trim().escape(),
+  body('units').optional().isNumeric(),
+  body('costPerUnit').optional().isNumeric(),
+  handleValidationErrors
+], (req, res) => {
   const data = readDB();
   const newExpense = { id: Date.now(), ...req.body };
   data.expenses.push(newExpense);
@@ -221,12 +355,18 @@ app.post('/api/expenses', (req, res) => {
 
 
 // Projects endpoints
-app.get('/api/projects', (req, res) => {
+app.get('/api/projects', authenticateToken, (req, res) => {
   const data = readDB();
   res.json(data.projects);
 });
 
-app.post('/api/projects', (req, res) => {
+app.post('/api/projects', [
+  authenticateToken,
+  body('name').trim().escape(),
+  body('crop').trim().escape(),
+  body('acreage').optional().isNumeric(),
+  handleValidationErrors
+], (req, res) => {
   const data = readDB();
   const newProject = { id: Date.now(), ...req.body };
   data.projects.push(newProject);
@@ -237,7 +377,7 @@ app.post('/api/projects', (req, res) => {
 
 
 // Revenue by crop endpoint
-app.get('/api/revenue-by-crop', (req, res) => {
+app.get('/api/revenue-by-crop', authenticateToken, (req, res) => {
   const data = readDB();
   res.json(data.revenueByCrop);
 });
@@ -245,7 +385,7 @@ app.get('/api/revenue-by-crop', (req, res) => {
 
 
 // Monthly financials endpoint
-app.get('/api/monthly-financials', (req, res) => {
+app.get('/api/monthly-financials', authenticateToken, (req, res) => {
   const data = readDB();
   res.json(data.monthlyFinancials);
 });
@@ -253,7 +393,7 @@ app.get('/api/monthly-financials', (req, res) => {
 
 
 // Summary endpoint
-app.get('/api/summary', (req, res) => {
+app.get('/api/summary', authenticateToken, (req, res) => {
   const data = readDB();
   const totalRevenue = data.income.reduce((sum, item) => sum + (item.amount || 0), 0);
   const totalExpenses = data.expenses.reduce((sum, item) => sum + (item.amount || 0), 0);
@@ -269,6 +409,12 @@ app.get('/api/summary', (req, res) => {
 
 initDB();
 
+// Global error handler
+app.use((err, req, res, next) => {
+  logger.error('Unhandled error', { error: err.message, stack: err.stack, url: req.url });
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  logger.info(`Server running on http://localhost:${PORT}`);
 });

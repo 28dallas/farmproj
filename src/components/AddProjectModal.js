@@ -1,8 +1,39 @@
 import React, { useState } from 'react';
 
-const AddProjectModal = () => {
+const AddProjectModal = ({ onAddProject }) => {
   const [show, setShow] = useState(false);
-  // Add more state for project fields as needed
+  const [formData, setFormData] = useState({
+    name: '',
+    crop: '',
+    acreage: '',
+    yieldAcre: '',
+    marketPrice: '',
+    costAcre: '',
+    status: 'Planning',
+    startDate: ''
+  });
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const estIncome = parseFloat(formData.acreage || 0) * parseFloat(formData.yieldAcre || 0) * parseFloat(formData.marketPrice || 0);
+    const estCost = parseFloat(formData.acreage || 0) * parseFloat(formData.costAcre || 0);
+    onAddProject({ ...formData, estIncome, estCost, id: Date.now() });
+    setFormData({
+      name: '',
+      crop: '',
+      acreage: '',
+      yieldAcre: '',
+      marketPrice: '',
+      costAcre: '',
+      status: 'Planning',
+      startDate: ''
+    });
+    setShow(false);
+  };
 
   return (
     <>
@@ -23,12 +54,73 @@ const AddProjectModal = () => {
               &times;
             </button>
             <h3 className="text-lg font-semibold mb-4">Add Project</h3>
-            <form className="flex flex-col gap-4">
-              {/* Add project fields here */}
-              <input className="border rounded px-3 py-2" placeholder="Project Name" />
-              <input className="border rounded px-3 py-2" placeholder="Crop" />
-              <input className="border rounded px-3 py-2" placeholder="Acreage" />
-              {/* ... */}
+            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Project Name"
+                required
+              />
+              <input
+                name="crop"
+                value={formData.crop}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Crop"
+                required
+              />
+              <input
+                name="acreage"
+                value={formData.acreage}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Acreage"
+                type="number"
+              />
+              <input
+                name="yieldAcre"
+                value={formData.yieldAcre}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Yield/Acre"
+                type="number"
+              />
+              <input
+                name="marketPrice"
+                value={formData.marketPrice}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Market Price"
+                type="number"
+              />
+              <input
+                name="costAcre"
+                value={formData.costAcre}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                placeholder="Cost/Acre"
+                type="number"
+              />
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+              >
+                <option value="Planning">Planning</option>
+                <option value="Active">Active</option>
+                <option value="Completed">Completed</option>
+                <option value="On Hold">On Hold</option>
+              </select>
+              <input
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleInputChange}
+                className="border rounded px-3 py-2"
+                type="date"
+              />
               <div className="flex justify-end mt-6">
                 <button
                   className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded mr-2"
@@ -38,8 +130,7 @@ const AddProjectModal = () => {
                 <button
                   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                   type="submit"
-                  onClick={e => { e.preventDefault(); setShow(false); }}
-                >Save</button>
+                >Save Project</button>
               </div>
             </form>
           </div>

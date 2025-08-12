@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import apiService from '../services/api';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
-const Signup = ({ onSignup, onSwitchToLogin }) => {
+const Signup = ({ onSwitchToLogin }) => {
+  const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -17,21 +18,21 @@ const Signup = ({ onSignup, onSwitchToLogin }) => {
     setLoading(true);
     setError('');
     setSuccess('');
+    
     try {
-      const res = await fetch(`${API_URL}/api/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, email, displayName })
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || 'Signup failed');
-      }
-      const user = await res.json();
+      const response = await apiService.signup({ username, password, email, displayName });
+      const { token, ...userData } = response;
+      
       setSuccess('Signup successful! Logging you in...');
-      setTimeout(() => onSignup(user), 1000);
+      setTimeout(() => {
+        login(userData, token);
+      }, 1000);
     } catch (err) {
-      setError(err.message);
+      if (err.message.includes('Password must')) {
+        setError('Password must be at least 8 characters with uppercase, lowercase, number and special character');
+      } else {
+        setError(err.message || 'Signup failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -71,7 +72,7 @@ const Signup = ({ onSignup, onSwitchToLogin }) => {
           />
         </div>
         <div>
-          <label className="block mb-1 font-medium text-gray-700">Email (optional)</label>
+          <label className="block mb-1 font-medium text-gray-700">Email</label>
           <input
             type="email"
             value={email}
@@ -80,7 +81,7 @@ const Signup = ({ onSignup, onSwitchToLogin }) => {
           />
         </div>
         <div>
-          <label className="block mb-1 font-medium text-gray-700">Display Name (optional)</label>
+          <label className="block mb-1 font-medium text-gray-700">Display Name</label>
           <input
             type="text"
             value={displayName}

@@ -3,6 +3,13 @@ import AddCropModal from './AddCropModal';
 
 const Crops = () => {
   const [crops, setCrops] = useState([]);
+  const [localCrops, setLocalCrops] = useState([]);
+
+  const handleAddCrop = (newCrop) => {
+    setLocalCrops(prev => [...prev, newCrop]);
+  };
+
+  const allCrops = [...crops, ...localCrops];
 
   useEffect(() => {
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -14,7 +21,7 @@ const Crops = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex gap-2 mb-4">
-        <AddCropModal />
+        <AddCropModal onAddCrop={handleAddCrop} />
         <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Add Crop Type</button>
       </div>
       <div className="overflow-x-auto">
@@ -33,12 +40,12 @@ const Crops = () => {
             </tr>
           </thead>
           <tbody>
-            {crops.length === 0 && (
+            {allCrops.length === 0 && (
               <tr>
                 <td colSpan="9" className="text-center text-gray-500 py-4">No crops found</td>
               </tr>
             )}
-            {crops.map((crop, idx) => (
+            {allCrops.map((crop, idx) => (
               <tr key={idx} className="border-b">
                 <td className="px-2 py-1">{crop.name}</td>
                 <td className="px-2 py-1">{crop.type}</td>

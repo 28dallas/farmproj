@@ -1,34 +1,41 @@
 import React, { useState } from 'react';
 import Dashboard from './Dashboard';
 import { SidebarProvider } from './context/SidebarContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import { SettingsProvider } from './context/SettingsContext';
+import ErrorBoundary from './components/ErrorBoundary';
 
 
 
-function App() {
-  const [user, setUser] = useState(null);
+const AppContent = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [showSignup, setShowSignup] = useState(false);
 
-  const handleLogout = () => {
-    setUser(null);
-    setShowSignup(false);
-  };
-
-  if (!user) {
+  if (!isAuthenticated) {
     if (showSignup) {
-      return <Signup onSignup={setUser} onSwitchToLogin={() => setShowSignup(false)} />;
+      return <Signup onSwitchToLogin={() => setShowSignup(false)} />;
     }
-    return <Login onLogin={setUser} onSwitchToSignup={() => setShowSignup(true)} />;
+    return <Login onSwitchToSignup={() => setShowSignup(true)} />;
   }
 
   return (
     <SettingsProvider>
       <SidebarProvider>
-        <Dashboard user={user} onLogout={handleLogout} />
+        <Dashboard user={user} onLogout={logout} />
       </SidebarProvider>
     </SettingsProvider>
+  );
+};
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
